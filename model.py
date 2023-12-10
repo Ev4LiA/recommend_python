@@ -65,7 +65,7 @@ class MFModel:
     def predict(self, user_id: str, books: pd.DataFrame, top: int = 10):
         predicted_ratings = []
         for row in books.itertuples():
-            pred = self.model.predict_one(user_id, row.id)
+            pred = self.model.predict_one(user_id, row.uuid)
             predicted_ratings.append(pred)
         books['pred_rating'] = predicted_ratings
         books = books.sort_values(

@@ -14,18 +14,18 @@ class DB:
 
     def getBooksId(self):
         with self.engine.connect() as conn:
-            select_query = """SELECT id FROM public."Book" WHERE "isDeleted" is False and "privacy" is False """
+            select_query = """SELECT uuid FROM public."books" WHERE "deletedAt" is null """
             df = pd.read_sql(select_query, conn)
             return df
 
     def getBooksIdRatedByUser(self, user_id):
         with self.engine.connect() as conn:
             select_query = text("""
-                SELECT "id"
-                FROM public."Book"
-                WHERE id IN (
-                    SELECT "bookId"
-                    FROM public."Rating"
+                SELECT "uuid"
+                FROM public."books"
+                WHERE uuid IN (
+                    SELECT "bookUuid"
+                    FROM public."rating"
                     WHERE "userId" = :user_id
                 )
             """)
@@ -36,8 +36,8 @@ class DB:
     def getRatingsByUser(self, user_id):
         with self.engine.connect() as conn:
             select_query = text("""
-                SELECT "id" as "ratingId", "bookId" as "id", "rate"
-                FROM public."Rating"
+                SELECT "uuid" as "ratingId", "bookUuid" as "id", "rate"
+                FROM public."rating"
                 WHERE "userId" = :user_id
             """)
             params = {"user_id": user_id}
@@ -48,7 +48,7 @@ class DB:
         with self.engine.connect() as conn:
             if start and end:
                 select_query = text(
-                    """SELECT * FROM public."Rating" WHERE "isDeleted" is False AND "updatedAt" BETWEEN :start AND :end""")
+                    """SELECT * FROM public."rating" WHERE "deletedAt" is null AND "updatedAt" BETWEEN :start AND :end""")
                 params = {"start": start, "end": end}
                 df = pd.read_sql(select_query, conn, params=params)
                 return df

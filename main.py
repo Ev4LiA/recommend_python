@@ -100,7 +100,7 @@ def recommender(uid):
         if len(rated_books.index) < 3:
             return Response(response="Not enough data for this user", status=400)
         unrated_books = db.getBooksId()
-        cond = unrated_books['id'].isin(rated_books['id'])
+        cond = unrated_books['uuid'].isin(rated_books['uuid'])
         unrated_books.drop(unrated_books[cond].index, inplace=True)
         prediction = model.predict(uid, unrated_books)
         return jsonify(prediction.to_dict('records'))
